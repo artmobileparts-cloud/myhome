@@ -47,8 +47,13 @@ jobs:
       # Боевое приложение не лежит в репозитории готовым файлом: оно вынимается
       # из прототипа скриптом по меткам самого прототипа. Так правка прототипа
       # доезжает до APK одной командой, а копия не устаревает молча.
+      # Отладочный APK собирается для показа: сервера нет, мир пустой, и без
+      # двери предпросмотра войти в приложение буквально не за кого. Дверь даёт
+      # мастер-код, собирает демо-мир и сажает внутрь за роль; обычный вход по
+      # номеру из неё тоже доступен. Код меняется переменной репозитория
+      # MYHOME_PREVIEW_CODE (Settings → Secrets and variables → Variables).
       - name: Вынуть боевое приложение из прототипа
-        run: node tools/extract-prod.mjs
+        run: node tools/extract-prod.mjs --preview --code=${{ vars.MYHOME_PREVIEW_CODE || '2026' }}
 
       - name: Проверить XML-ресурсы
         run: python3 tools/check-xml.py
@@ -62,6 +67,18 @@ jobs:
       - name: Собрать отладочный APK
         working-directory: android
         run: ./gradlew --no-daemon assembleDebug
+
+      # Релиз собирается ЗАНОВО и начисто: мастер-код — дверь без замка, и в
+      # приложении, которое стоит у людей на телефонах, ему не место. Выемка
+      # это стережёт сама и отказывается собирать --preview при MYHOME_RELEASE=1.
+      - name: Пересобрать веб-часть начисто для релиза
+        if: inputs.release
+        env:
+          MYHOME_RELEASE: '1'
+        run: |
+          node tools/extract-prod.mjs
+          node tools/fetch-fonts.mjs
+          npx cap sync android
 
       - name: Собрать релизный APK
         if: inputs.release

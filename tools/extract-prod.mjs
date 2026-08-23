@@ -26,6 +26,25 @@ const SRC = path.join(ROOT, 'src', 'prototype.html');
 const OUT_DIR = path.join(ROOT, 'www');
 const OUT = path.join(OUT_DIR, 'index.html');
 
+/* --------------------------------------------------------- режим сборки ---
+   Без ключей собирается чистое боевое приложение. С --preview добавляется
+   дверь для показа: мастер-код, сборка демо-мира и вход за роль — иначе
+   приложение без сервера показать нечем, мир пустой и войти не за кого.
+
+   Ключ --code=XXXX задаёт мастер-код. */
+const ARGS = process.argv.slice(2);
+const PREVIEW = ARGS.includes('--preview');
+const CODE = (ARGS.find(a => a.startsWith('--code=')) || '--code=2026').slice(7);
+
+/* Предпросмотр в релизе — это дверь без замка в приложении, которое стоит у
+   людей на телефонах. Отказываемся вслух, а не молча собираем. */
+if (PREVIEW && process.env.MYHOME_RELEASE === '1') {
+  throw new Error('--preview и релизная сборка вместе не собираются: мастер-код в релиз не едет.');
+}
+if (PREVIEW && !/^\d{4,8}$/.test(CODE)) {
+  throw new Error(`мастер-код «${CODE}» не годится: нужны 4–8 цифр.`);
+}
+
 let html = await readFile(SRC, 'utf8');
 const before = html.length;
 const done = [];
@@ -200,8 +219,16 @@ cut('имя устройства', 'const D = {', 'const ДЕВ = \'res\';\ncons
 /* ------------------------------------------------------------------- леса */
 
 /* Теперь, когда никто из боевого кода их не зовёт, сами леса вынимаются.
-   Список берётся из прототипа — прототип пополнил SCAFFOLD_FNS, выемка узнала. */
-{
+   Список берётся из прототипа — прототип пополнил SCAFFOLD_FNS, выемка узнала.
+
+   В предпросмотре леса остаются: показывать приложение не на чем, а собирает
+   демо-мир как раз лес (makeEnv) и тянет за собой соседей. Разбирать, кто из
+   них кому нужен, ради сборки для показа — работа впустую и лишний повод
+   ошибиться; чистое боевое приложение собирается без ключа --preview и лесов
+   в нём нет. */
+if (PREVIEW) {
+  done.push('леса: оставлены — предпросмотру нужен сборщик демо-мира');
+} else {
   if (!parses()) throw new Error('код перестал разбираться ещё до выемки лесов — виновата правка выше.');
   let total = 0, gone = 0, missing = [], refused = [];
   for (const name of scaffoldNames()) {
@@ -225,12 +252,26 @@ cut('боевая раскладка', '</head>', '<link href="prod.css" rel="st
 cut('оболочка приложения', '</body>',
     '<script src="app-shell.js"></script>\n</body>');
 
+/* ---------------------------------------------------------- предпросмотр */
+
+if (PREVIEW) {
+  cut('дверь предпросмотра', '<script src="app-shell.js"></script>',
+      '<script src="preview.js"></script>\n<script src="app-shell.js"></script>');
+}
+
 /* ------------------------------------------------------------------ вывод */
 
 await mkdir(OUT_DIR, { recursive: true });
 await writeFile(OUT, html);
 await copyFile(path.join(ROOT, 'src', 'prod.css'), path.join(OUT_DIR, 'prod.css'));
 
-console.log('Выемка боевого приложения:');
+if (PREVIEW) {
+  const js = await readFile(path.join(ROOT, 'src', 'preview.js'), 'utf8');
+  if (!js.includes("'__КОД__'")) throw new Error('в preview.js не найдено место для мастер-кода.');
+  await writeFile(path.join(OUT_DIR, 'preview.js'), js.replace("'__КОД__'", `'${CODE}'`));
+  done.push(`дверь предпросмотра: мастер-код ${CODE}`);
+}
+
+console.log(PREVIEW ? 'Выемка боевого приложения (сборка для показа):' : 'Выемка боевого приложения:');
 for (const d of done) console.log('  · ' + d);
 console.log(`Было ${(before / 1048576).toFixed(2)} МБ → стало ${(html.length / 1048576).toFixed(2)} МБ.`);

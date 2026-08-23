@@ -2,13 +2,15 @@
   "name": "myhome",
   "version": "1.0.0",
   "private": true,
-  "description": "Мой Дом — платформа управления жилым домом (ваад-байт). Android-обёртка вокруг прототипа.",
+  "description": "Мой Дом — платформа управления жилым домом (ваад-байт). Боевое приложение вынимается из прототипа.",
   "scripts": {
-    "build": "node tools/extract-prod.mjs && npx cap sync android",
     "extract": "node tools/extract-prod.mjs",
+    "extract:preview": "node tools/extract-prod.mjs --preview --code=2026",
     "fonts": "node tools/fetch-fonts.mjs",
-    "apk:debug": "npm run build && cd android && ./gradlew assembleDebug",
-    "apk:release": "npm run build && cd android && ./gradlew assembleRelease"
+    "build": "npm run extract && npx cap sync android",
+    "build:preview": "npm run extract:preview && npx cap sync android",
+    "apk:debug": "npm run build:preview && cd android && ./gradlew assembleDebug",
+    "apk:release": "MYHOME_RELEASE=1 npm run build && cd android && ./gradlew assembleRelease"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.0",
