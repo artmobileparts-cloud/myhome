@@ -1,0 +1,12 @@
+{
+  "appId": "com.artmobileparts.myhome",
+  "appName": "Мой Дом",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false,
+    "webContentsDebuggingEnabled": true
+  },
+  "server": {
+    "androidScheme": "https"
+  }
+}

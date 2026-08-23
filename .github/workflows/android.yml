@@ -1,0 +1,80 @@
+# Сборка Android-приложения «Мой Дом» из прототипа.
+#
+# Локально собрать APK нельзя без Android SDK, поэтому сборка живёт здесь:
+# на бегунке GitHub SDK уже стоит. Готовый файл забирается со страницы запуска,
+# раздел Artifacts.
+name: Android APK
+
+on:
+  push:
+    branches: ['**']
+    paths-ignore: ['docs/**', '**/*.md']
+  workflow_dispatch:
+    inputs:
+      release:
+        description: 'Собрать релизный APK (нужны секреты подписи)'
+        type: boolean
+        default: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Установить зависимости
+        run: npm ci
+
+      # Шрифты должны лежать ВНУТРИ приложения, а не тянуться из сети:
+      # приложение открывают в подъезде, где связи почти нет, а подменный
+      # шрифт другой ширины ломает всю раскладку (правило из прототипа).
+      - name: Вшить шрифты в приложение
+        run: node tools/fetch-fonts.mjs
+
+      - name: Перенести веб-часть в Android-проект
+        run: npx cap sync android
+
+      - name: Собрать отладочный APK
+        working-directory: android
+        run: ./gradlew --no-daemon assembleDebug
+
+      - name: Собрать релизный APK
+        if: inputs.release
+        working-directory: android
+        env:
+          MYHOME_KEYSTORE_PASSWORD: ${{ secrets.MYHOME_KEYSTORE_PASSWORD }}
+          MYHOME_KEY_ALIAS: ${{ secrets.MYHOME_KEY_ALIAS }}
+          MYHOME_KEY_PASSWORD: ${{ secrets.MYHOME_KEY_PASSWORD }}
+          MYHOME_VERSION_CODE: ${{ github.run_number }}
+        run: |
+          if [ -n "${{ secrets.MYHOME_KEYSTORE_BASE64 }}" ]; then
+            echo "${{ secrets.MYHOME_KEYSTORE_BASE64 }}" | base64 -d > "$RUNNER_TEMP/myhome.jks"
+            export MYHOME_KEYSTORE="$RUNNER_TEMP/myhome.jks"
+          else
+            echo "::warning::Секрета MYHOME_KEYSTORE_BASE64 нет — APK выйдет неподписанным."
+          fi
+          ./gradlew --no-daemon assembleRelease
+
+      - name: Выложить APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: myhome-apk
+          retention-days: 30
+          if-no-files-found: error
+          path: |
+            android/app/build/outputs/apk/debug/*.apk
+            android/app/build/outputs/apk/release/*.apk

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Заставка: фирменный фон + значок по центру. Раскладкой, а не картинкой —
+     тогда она одинаково резкая на любой плотности экрана и не тянет за собой
+     десяток PNG под каждую папку. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/brandBg" />
+    <item>
+        <bitmap
+            android:gravity="center"
+            android:src="@mipmap/ic_launcher" />
+    </item>
+</layer-list>

@@ -1,0 +1,13 @@
+node_modules/
+.DS_Store
+*.log
+
+# Ключи подписи рядом с кодом не лежат — только в секретах CI
+*.jks
+*.keystore
+keystore.properties
+
+# Сборочные артефакты
+*.apk
+*.aab
+www/fonts/

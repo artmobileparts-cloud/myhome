@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Цвета берутся из дизайн-токенов прототипа (docs/08-ДИЗАЙН-ТОКЕНЫ.md).
+     Меняются ТОЛЬКО вслед за токенами, чтобы обложка приложения не разошлась
+     с тем, что человек видит внутри. -->
+<resources>
+    <color name="colorPrimary">#FF6A4D</color>   <!-- --accent  -->
+    <color name="colorPrimaryDark">#0C0C0E</color><!-- --ink     -->
+    <color name="colorAccent">#FF6A4D</color>    <!-- --accent  -->
+    <color name="brandBg">#ECECED</color>        <!-- --bg      -->
+    <color name="brandSurface">#FFFFFF</color>   <!-- --surface -->
+</resources>
