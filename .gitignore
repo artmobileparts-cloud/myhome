@@ -11,3 +11,7 @@ keystore.properties
 *.apk
 *.aab
 www/fonts/
+
+# Боевое приложение собирается из src/prototype.html скриптом tools/extract-prod.mjs
+www/index.html
+www/prod.css

@@ -28,8 +28,9 @@
   function navBackFn() { try { return navBack; } catch (e) { return null; } }
 
   document.addEventListener('pointerdown', function (e) {
-    var host = e.target && e.target.closest ? e.target.closest('[id^="app-"]') : null;
-    if (host) lastDev = host.id.slice(4);
+    var host = e.target && e.target.closest
+      ? e.target.closest('[id^="app-"],[id^="wrap-"]') : null;
+    if (host) lastDev = host.id.replace(/^(app|wrap)-/, '');
   }, true);
 
   function activeDev() {
