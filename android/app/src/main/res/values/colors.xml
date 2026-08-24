@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Цвета обложки сняты с ЖИВОГО экрана приложения, а не из :root прототипа:
-     TOK накладывает оверрайды на .screen, и в :root лежат другие значения.
-     Держим согласие, иначе заставка мигнёт одним цветом, а приложение
-     откроется другим.
+<!-- Цвета обложки сняты с ЖИВОГО экрана приложения (сборка 25.08-562), а не
+     из :root прототипа: TOK накладывает оверрайды на .screen, и в :root лежат
+     другие значения. Держим согласие, иначе заставка мигнёт одним цветом, а
+     приложение откроется другим.
 
      Имена в скобках без двойного дефиса: в комментариях XML он запрещён. -->
 <resources>
-    <color name="colorPrimary">#33356B</color>     <!-- accent экрана  -->
+    <color name="colorPrimary">#0A84FF</color>     <!-- accent экрана  -->
     <color name="colorPrimaryDark">#0C0C0E</color> <!-- ink            -->
-    <color name="colorAccent">#33356B</color>      <!-- accent экрана  -->
-    <color name="brandBg">#EDEDF3</color>          <!-- bg экрана      -->
+    <color name="colorAccent">#0A84FF</color>      <!-- accent экрана  -->
+    <color name="brandBg">#FBFBFA</color>          <!-- bg экрана      -->
     <color name="brandSurface">#FFFFFF</color>     <!-- surface        -->
 </resources>
