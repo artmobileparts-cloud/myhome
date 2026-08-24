@@ -22,31 +22,23 @@ jobs:
     timeout-minutes: 30
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: '22'
           cache: npm
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: '21'
 
-      - uses: android-actions/setup-android@v3
+      - uses: android-actions/setup-android@v4
 
       - name: Установить зависимости
         run: npm ci
 
-      # Шрифты должны лежать ВНУТРИ приложения, а не тянуться из сети:
-      # приложение открывают в подъезде, где связи почти нет, а подменный
-      # шрифт другой ширины ломает всю раскладку (правило из прототипа).
-      # Ресурсы Android падают на мелочах, которых не видно глазом.
-      # Секунда здесь дешевле полного круга сборки.
-      # Боевое приложение не лежит в репозитории готовым файлом: оно вынимается
-      # из прототипа скриптом по меткам самого прототипа. Так правка прототипа
-      # доезжает до APK одной командой, а копия не устаревает молча.
       # Прототип с версии 24.08-530 сам превращается в приложение: режим
       # html.real гасит пульт, соседние телефоны, админку и нарисованный
       # корпус трубки. Сборка добавляет только то, чего ему не хватает внутри
@@ -54,9 +46,14 @@ jobs:
       - name: Собрать приложение из прототипа
         run: node tools/build-app.mjs
 
+      # Ресурсы Android падают на мелочах, которых не видно глазом.
+      # Секунда здесь дешевле полного круга сборки.
       - name: Проверить XML-ресурсы
         run: python3 tools/check-xml.py
 
+      # Шрифты должны лежать ВНУТРИ приложения, а не тянуться из сети:
+      # приложение открывают в подъезде, где связи почти нет, а подменный
+      # шрифт другой ширины ломает всю раскладку (правило из прототипа).
       - name: Вшить шрифты в приложение
         run: node tools/fetch-fonts.mjs
 
@@ -85,7 +82,7 @@ jobs:
           ./gradlew --no-daemon assembleRelease
 
       - name: Выложить APK
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: myhome-apk
           retention-days: 30
