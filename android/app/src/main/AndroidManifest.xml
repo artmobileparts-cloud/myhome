@@ -9,8 +9,13 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+        <!-- adjustResize — третье требование прототипа к обёртке (блок html.real
+             в его CSS): окно сжимается под клавиатуру, и прототип по сжатию
+             видит набор через visualViewport и прячет нижнюю панель (kb-open).
+             Без этого панель навигации «едет» вверх на каждом наборе. -->
         <activity
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode|navigation|density"
+            android:windowSoftInputMode="adjustResize"
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBarLaunch"
