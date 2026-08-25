@@ -1,7 +1,9 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Мой Дом</string>
-    <string name="title_activity_main">Мой Дом</string>
+    <!-- Имя приложения — бренд, и бренд не переводят (правило из прототипа):
+         «Ваадон» пишется на иврите ועדון и звучит одинаково на всех пяти языках. -->
+    <string name="app_name">ועדון</string>
+    <string name="title_activity_main">ועדון</string>
     <string name="package_name">com.artmobileparts.myhome</string>
     <string name="custom_url_scheme">com.artmobileparts.myhome</string>
 </resources>

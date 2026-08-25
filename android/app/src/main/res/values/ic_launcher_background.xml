@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="ic_launcher_background">#FFFFFF</color> <!-- подложка адаптивного значка -->
+    <!-- Подложка адаптивного значка — терракот ЛОГО_ФОН из appIcon() прототипа. -->
+    <color name="ic_launcher_background">#C2562C</color>
 </resources>
